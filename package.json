@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha utils.test.js",
+    "test": "NODE_ENV=test mocha __tests__/app.test.js ",
     "dev": "nodemon listen.js",
     "start": "node listen.js",
-    "seed": "knex seed:run",
+    "seed": "NODE_ENV=test knex seed:run ",
     "setup-dbs": "psql -f ./db/setup.sql",
     "migrate-make": "knex migrate:make",
     "migrate-latest": "knex migrate:latest",
@@ -43,6 +43,7 @@
   "dependencies": {
     "D": "^1.0.0",
     "chai-datetime": "^1.7.0",
+    "express": "^4.17.1",
     "knex": "^0.21.12",
     "pg": "^8.5.1"
   }

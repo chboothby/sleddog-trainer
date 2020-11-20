@@ -3,6 +3,7 @@ exports.up = function (knex) {
     mushersTable.text("name").primary();
     mushersTable.integer("kennel_id").references("kennels.kennel_id");
     mushersTable.text("display_pic");
+    mushersTable.text("nationality");
   });
 };
 

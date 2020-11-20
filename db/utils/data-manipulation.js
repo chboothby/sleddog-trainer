@@ -1,5 +1,3 @@
-const { toLocaleString } = require("../data/test-data/dogs");
-
 exports.createKennelRef = (kennelRows) => {
   const kennelRef = {};
   kennelRows.forEach((kennel) => {
