@@ -6,7 +6,7 @@ module.exports = [
     birth_date: "10/2/2017",
     km_ran: 180,
     team_position: "wheel",
-    gender: "dog",
+    gender: "male",
   },
   {
     name: "Njalla",
@@ -15,7 +15,7 @@ module.exports = [
     birth_date: "6/6/2012",
     km_ran: 398,
     team_position: "lead",
-    gender: "dog",
+    gender: "male",
   },
   {
     name: "Mickey",
@@ -31,15 +31,15 @@ module.exports = [
     birth_date: "11/6/2018",
     km_ran: 180,
     team_position: "lead",
-    gender: "bitch",
+    gender: "female",
   },
   {
     name: "Shaggy",
     nickname: "swaggly",
     kennel: "Northern Soul Journeys",
     birth_date: "20/8/2014",
-    km_ran: 208,
+    km_ran: 101,
     team_position: "wheel",
-    gender: "dog",
+    gender: "male",
   },
 ];
