@@ -1,7 +1,6 @@
 const app = require("../app");
 const request = require("supertest");
 const connection = require("../db/connection");
-const { response } = require("express");
 const chai = require("chai"),
   expect = chai.expect;
 
@@ -94,7 +93,49 @@ describe("/api", async function () {
           "nationality",
         ]);
       });
+      it("Should return mushers in alphabetical name order by default", async function () {
+        const {
+          status,
+          body: { mushers },
+        } = await request(app).get("/api/mushers");
+        console.log(mushers);
+        expect(mushers).to.be.sortedBy("name");
+      });
+      it.skip("Should return mushers sorted by given params", async function () {
+        const {
+          status,
+          body: { mushers },
+        } = await request(app).get("/api/mushers?sort_by=dogs&order=desc");
+        console.log(mushers);
+        expect(mushers).to.be.sortedBy("dogCount", { descending: true });
+      });
     });
+    describe("POST", async function () {
+      it("Responds with 201 and an object containing new musher", async function () {
+        const { status, body } = await request(app).post("/api/mushers").send({
+          name: "Jeremias",
+          kennel: "Northern Soul Journeys",
+          nationality: "Swedish",
+        });
+
+        expect(status).to.equal(201);
+        expect(body).to.haveOwnProperty("musher");
+      });
+      it("Mushers should have the expected keys including kennel name instead of id and dogCount", async function () {
+        const { status, body } = await request(app).get("/api/mushers");
+        expect(body.mushers[0]).to.haveOwnProperty("dogCount");
+        expect(body.mushers[0]).to.haveOwnProperty("kennel");
+        expect(body.mushers[0]).to.have.all.keys([
+          "musher_id",
+          "display_pic",
+          "dogCount",
+          "kennel",
+          "name",
+          "nationality",
+        ]);
+      });
+    });
+
     describe("/api/mushers/:musher_id", function () {
       describe("GET", function () {
         it("Responds with 200 and a an object containing that mushers details, with a key of dog count representing the number of dogs in that mushers kennel", async function () {
@@ -120,7 +161,19 @@ describe("/api", async function () {
           expect(response.body.msg).to.equal("Dog musher not found");
         });
       });
-      describe.only("ERRORS", function () {
+      describe("PATCH", function () {
+        it("Responds with 201, created and returns updated dog musher", async function () {
+          const {
+            status,
+            body: { musher },
+          } = await request(app)
+            .patch("/api/mushers/1")
+            .send({ nationality: "British" });
+          expect(status).to.equal(201);
+          expect(musher.nationality).to.equal("British");
+        });
+      });
+      describe("ERRORS", function () {
         it("Responds with 404 not found when searching for musher with non existent ID", async function () {
           const { status, body } = await request(app).get("/api/mushers/1000");
           expect(status).to.equal(404);
@@ -133,103 +186,125 @@ describe("/api", async function () {
           expect(status).to.equal(404);
           expect(body.msg).to.equal("Dog musher not found");
         });
-      //   it("Responds with 400 when invalid input type for id", async function () {
-      //     const methods = ["get", "delete"];
-      //     const responses = methods.map(async (method) => {
-      //       await request(app)[method]("/api/mushers/notAnID");
-      //     });
-      //     return Promise.all(responses).then((response) => {
-      //       console.log(response);
-      //     });
-      //   });
-      // });
-      // update musher
-      // add new musher
-      // sort mushers
+        it("Responds with 400 when invalid input type for id", async function () {
+          const methods = ["get", "delete"];
+          const responses = methods.map(async (method) => {
+            await request(app)[method]("/api/mushers/notAnID");
+          });
+          return Promise.all(responses).then((response) => {
+            console.log(response);
+          });
+        });
+        it("Responds with 400 when missing data from post request", async function () {
+          const { status, body } = await request(app)
+            .post("/api/mushers")
+            .send({ name: "Jeremias", nationality: "Swedish" });
+
+          expect(status).to.equal(400);
+          expect(body.msg).to.equal("Request missing kennel name");
+        });
+        it("Responds with 400 when missing data from post request", async function () {
+          const { status, body } = await request(app)
+            .post("/api/mushers")
+            .send({ name: "Jeremias", kennel: "Northern Soul Journeys" });
+
+          expect(status).to.equal(400);
+          expect(body.msg).to.equal("Incomplete request");
+        });
+        it("Responds with 400 when tries to update non existent row", async function () {
+          const { status, body } = await request(app)
+            .patch("/api/mushers/1")
+            .send({ notAColumn: "Jeremias" });
+
+          expect(status).to.equal(400);
+          expect(body.msg).to.equal("Invalid input type");
+        });
+        //   // sort mushers
+      });
     });
-  });
-  describe("/api/kennels/:kennel_id/dogs", async function () {
-    describe("GET", async function () {
-      it("Responds with 200 and an object containing an array of all dogs in that kennel", async function () {
-        const { status, body } = await request(app).get("/api/kennels/1/dogs");
-
-        expect(status).to.equal(200);
-        expect(body).to.haveOwnProperty("dogs");
-        expect(body.dogs.length).to.equal(3);
-      });
-      it("Dogs should have the expected keys including kennel name instead of kennel id  ", async function () {
-        const { body } = await request(app).get("/api/kennels/1/dogs");
-
-        expect(body.dogs[0]).to.have.all.keys([
-          "dog_id",
-          "birth_date",
-          "display_pic",
-          "gender",
-          "kennel",
-          "km_ran",
-          "name",
-          "needs_booties",
-          "nickname",
-          "team_position",
-        ]);
-      });
-      it("Accepts QUERIES and filters results by name, needs-booties, team_position, gender", async function () {
-        const queries = [
-          `name=shaggy`,
-          `needs_booties=true`,
-          `team_position=wheel`,
-          "gender=male",
-        ];
-        const promisesArray = await queries.map(async (query) => {
-          return request(app).get(`/api/kennels/1/dogs?${query}`);
-        });
-        const [name, booties, position, gender] = await Promise.all(
-          promisesArray
-        );
-        expect(name.body.dogs.length).to.equal(1);
-        expect(name.body.dogs[0].name).to.equal("Shaggy");
-
-        expect(booties.body.dogs.length).to.equal(0);
-
-        expect(position.body.dogs.length).to.equal(2);
-        expect(gender.body.dogs.length).to.equal(3);
-      });
-      it("Accepts an SORT by query which defaults to ascending", async function () {
-        const orderByQueries = ["name", "km_ran", "birth_date"];
-        const promises = await orderByQueries.map(async (query) => {
-          return request(app).get(`/api/kennels/1/dogs?sort_by=${query}`);
-        });
-
-        const responses = await Promise.all(promises);
-
-        expect(responses[0].body.dogs).to.be.sortedBy("name");
-        expect(responses[1].body.dogs).to.be.sortedBy("km_ran", {
-          coerce: true,
-        });
-        expect(responses[2].body.dogs).to.be.sortedBy("birth_date");
-      });
-      it("Accepts an ORDER query", async function () {
-        const orderByQueries = ["name", "km_ran", "birth_date"];
-        const promises = await orderByQueries.map(async (query) => {
-          return request(app).get(
-            `/api/kennels/1/dogs?sort_by=${query}&order=desc`
+    describe("/api/kennels/:kennel_id/dogs", async function () {
+      describe("GET", async function () {
+        it("Responds with 200 and an object containing an array of all dogs in that kennel", async function () {
+          const { status, body } = await request(app).get(
+            "/api/kennels/1/dogs"
           );
-        });
 
-        const responses = await Promise.all(promises);
+          expect(status).to.equal(200);
+          expect(body).to.haveOwnProperty("dogs");
+          expect(body.dogs.length).to.equal(3);
+        });
+        it("Dogs should have the expected keys including kennel name instead of kennel id  ", async function () {
+          const { body } = await request(app).get("/api/kennels/1/dogs");
 
-        expect(responses[0].body.dogs).to.be.sortedBy("name", {
-          descending: true,
+          expect(body.dogs[0]).to.have.all.keys([
+            "dog_id",
+            "birth_date",
+            "display_pic",
+            "gender",
+            "kennel",
+            "km_ran",
+            "name",
+            "needs_booties",
+            "nickname",
+            "team_position",
+          ]);
         });
-        expect(responses[1].body.dogs).to.be.sortedBy("km_ran", {
-          descending: true,
+        it("Accepts QUERIES and filters results by name, needs-booties, team_position, gender", async function () {
+          const queries = [
+            `name=shaggy`,
+            `needs_booties=true`,
+            `team_position=wheel`,
+            "gender=male",
+          ];
+          const promisesArray = await queries.map(async (query) => {
+            return request(app).get(`/api/kennels/1/dogs?${query}`);
+          });
+          const [name, booties, position, gender] = await Promise.all(
+            promisesArray
+          );
+          expect(name.body.dogs.length).to.equal(1);
+          expect(name.body.dogs[0].name).to.equal("Shaggy");
+
+          expect(booties.body.dogs.length).to.equal(0);
+
+          expect(position.body.dogs.length).to.equal(2);
+          expect(gender.body.dogs.length).to.equal(3);
         });
-        expect(responses[2].body.dogs).to.be.sortedBy("birth_date", {
-          descending: true,
+        it("Accepts an SORT by query which defaults to ascending", async function () {
+          const orderByQueries = ["name", "km_ran", "birth_date"];
+          const promises = await orderByQueries.map(async (query) => {
+            return request(app).get(`/api/kennels/1/dogs?sort_by=${query}`);
+          });
+
+          const responses = await Promise.all(promises);
+
+          expect(responses[0].body.dogs).to.be.sortedBy("name");
+          expect(responses[1].body.dogs).to.be.sortedBy("km_ran", {
+            coerce: true,
+          });
+          expect(responses[2].body.dogs).to.be.sortedBy("birth_date");
+        });
+        it("Accepts an ORDER query", async function () {
+          const orderByQueries = ["name", "km_ran", "birth_date"];
+          const promises = await orderByQueries.map(async (query) => {
+            return request(app).get(
+              `/api/kennels/1/dogs?sort_by=${query}&order=desc`
+            );
+          });
+
+          const responses = await Promise.all(promises);
+
+          expect(responses[0].body.dogs).to.be.sortedBy("name", {
+            descending: true,
+          });
+          expect(responses[1].body.dogs).to.be.sortedBy("km_ran", {
+            descending: true,
+          });
+          expect(responses[2].body.dogs).to.be.sortedBy("birth_date", {
+            descending: true,
+          });
         });
       });
     });
   });
 });
-
-//

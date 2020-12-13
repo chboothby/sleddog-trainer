@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 
-exports.fetchAllMushers = () => {
+exports.fetchAllMushers = (sort_by, order) => {
   return connection
     .select(
       "musher_id",
@@ -20,7 +20,7 @@ exports.fetchAllMushers = () => {
       "mushers.display_pic",
       "mushers.musher_id"
     )
-    .orderBy("kennel", "asc");
+    .orderBy(sort_by || "mushers.name", order || "asc");
 };
 
 exports.removeMusherById = (musher_id) => {
@@ -52,4 +52,33 @@ exports.fetchMusherById = (musher_id) => {
       "mushers.display_pic",
       "mushers.musher_id"
     );
+};
+
+exports.createNewMusher = async ({ kennel, ...rest }) => {
+  const [{ kennel_id }] = await connection
+    .select("kennel_id")
+    .from("kennels")
+    .where("kennel_name", "LIKE", kennel);
+
+  const newMusher = {
+    ...rest,
+    kennel_id,
+  };
+  return connection
+    .insert(newMusher)
+    .into("mushers")
+    .returning("*")
+    .then((musher) => {
+      return musher[0];
+    });
+};
+
+exports.patchMusherById = (musher_id, updates) => {
+  return connection("mushers")
+    .update(updates)
+    .where("musher_id", "=", musher_id)
+    .returning("*")
+    .then((musher) => {
+      return musher[0];
+    });
 };

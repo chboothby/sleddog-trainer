@@ -2,10 +2,13 @@ const {
   fetchAllMushers,
   removeMusherById,
   fetchMusherById,
+  createNewMusher,
+  patchMusherById,
 } = require("../models/mushers");
 
 exports.getAllMushers = (req, res, next) => {
-  fetchAllMushers()
+  const { sort_by, order } = req.params;
+  fetchAllMushers(sort_by, order)
     .then((mushers) => {
       res.status(200).send({ mushers });
     })
@@ -33,6 +36,33 @@ exports.getMusherById = (req, res, next) => {
         const [musher] = mushers;
         res.status(200).send({ musher });
       }
+    })
+    .catch(next);
+};
+
+exports.addNewMusher = (req, res, next) => {
+  const { body } = req;
+  createNewMusher(body)
+    .then((musher) => {
+      res.status(201).send({ musher });
+    })
+    .catch((err) => {
+      if (!err.code) {
+        return Promise.reject({
+          status: 400,
+          msg: "Request missing kennel name",
+        });
+      } else next(err);
+    })
+    .catch(next);
+};
+
+exports.updateMusherById = (req, res, next) => {
+  const { body } = req;
+  const { musher_id } = req.params;
+  patchMusherById(musher_id, body)
+    .then((musher) => {
+      res.status(201).send({ musher });
     })
     .catch(next);
 };
