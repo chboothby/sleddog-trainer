@@ -1,4 +1,4 @@
-const { fetchDogsByKennelId } = require("../models/dogs");
+const { fetchDogsByKennelId, postDogToKennel } = require("../models/dogs");
 
 exports.getDogsByKennelId = (req, res, next) => {
   const {
@@ -21,6 +21,17 @@ exports.getDogsByKennelId = (req, res, next) => {
   )
     .then((dogs) => {
       res.status(200).send({ dogs });
+    })
+    .catch(next);
+};
+
+exports.addDogToKennel = (req, res, next) => {
+  const { kennel_id } = req.params;
+  const newDog = req.body;
+  newDog.kennel_id = kennel_id;
+  postDogToKennel(newDog)
+    .then((dog) => {
+      res.status(201).send({ dog });
     })
     .catch(next);
 };

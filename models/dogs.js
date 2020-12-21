@@ -41,3 +41,12 @@ exports.fetchDogsByKennelId = (
     .join("kennels", "kennels.kennel_id", "dogs.kennel_id")
     .orderBy(sort_by || "name", order || "asc");
 };
+
+exports.postDogToKennel = (newDog) => {
+  return connection("dogs")
+    .insert(newDog)
+    .returning("*")
+    .then((dog) => {
+      return dog[0];
+    });
+};

@@ -305,6 +305,32 @@ describe("/api", async function () {
           });
         });
       });
+      describe.only("POST", async () => {
+        it("responds with 201 and returns newly added dog", async () => {
+          const response = await request(app).post("/api/kennels/1").send({
+            name: "Moa",
+            birth_date: "17/3/2016",
+            nickname: "Tiny Ol' Moa",
+            team_position: "lead",
+            gender: "female",
+            km_ran: 102,
+          });
+
+          expect(response.status).to.equal(201);
+          expect(Object.keys(response.body.dog)).to.eql([
+            "dog_id",
+            "name",
+            "nickname",
+            "kennel_id",
+            "display_pic",
+            "birth_date",
+            "km_ran",
+            "needs_booties",
+            "team_position",
+            "gender",
+          ]);
+        });
+      });
     });
   });
 });
