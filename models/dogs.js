@@ -50,3 +50,25 @@ exports.postDogToKennel = (newDog) => {
       return dog[0];
     });
 };
+
+exports.fetchDogById = (dog_id) => {
+  return connection
+    .select(
+      "name",
+      "dog_id",
+      "birth_date",
+      "gender",
+      "km_ran",
+      "kennels.kennel_name AS kennel",
+      "display_pic",
+      "needs_booties",
+      "nickname",
+      "team_position"
+    )
+    .from("dogs")
+    .where("dogs.dog_id", "=", dog_id)
+    .join("kennels", "kennels.kennel_id", "dogs.kennel_id")
+    .then((dog) => {
+      return dog[0];
+    });
+};

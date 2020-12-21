@@ -8,15 +8,16 @@ chai.use(require("chai-sorted"));
 
 describe("/api", async function () {
   this.timeout(10000);
-  after(async function () {
+  after(function () {
     connection.destroy();
   });
   beforeEach(async function () {
     await connection.seed.run();
   });
-  describe("/api/kennels", async function () {
-    describe("GET", async function () {
-      it("Responds with 200 and object containing a an array off all the kennels in the db", async function () {
+  // KENNELS *************************
+  describe("/api/kennels", async () => {
+    describe("GET", async () => {
+      it("Responds with 200 and object containing a an array off all the kennels in the db", async () => {
         return request(app)
           .get("/api/kennels")
           .then(({ body, status }) => {
@@ -25,7 +26,7 @@ describe("/api", async function () {
             expect(body.kennels.length).to.equal(2);
           });
       });
-      it("Each kennel should have a property dogCount which represents the number of dogs living in that kennel", async function () {
+      it("Each kennel should have a property dogCount which represents the number of dogs living in that kennel", async () => {
         return request(app)
           .get("/api/kennels")
           .then(({ status, body }) => {
@@ -34,8 +35,8 @@ describe("/api", async function () {
           });
       });
     });
-    describe("POST", async function () {
-      it("Responds with 201 and the new kennel object", async function () {
+    describe("POST", async () => {
+      it("Responds with 201 and the new kennel object", async () => {
         const { status, body } = await request(app).post("/api/kennels").send({
           kennel_name: "Keep Dreaming",
           established: 2012,
@@ -52,8 +53,8 @@ describe("/api", async function () {
           },
         });
       });
-      describe("ERRORS", async function () {
-        it("400 - bad request invalid data type", async function () {
+      describe("ERRORS", async () => {
+        it("400 - bad request invalid data type", async () => {
           const { status, body } = await request(app)
             .post("/api/kennels")
             .send({ kennel_name: "Keep Dreaming", established: "notAyear" });
@@ -61,7 +62,7 @@ describe("/api", async function () {
           expect(status).to.equal(400);
           expect(body.msg).to.equal("Invalid input type");
         });
-        it("400 - missing data from post request", async function () {
+        it("400 - missing data from post request", async () => {
           const { status, body } = await request(app)
             .post("/api/kennels")
             .send({ established: 2012 });
@@ -71,16 +72,17 @@ describe("/api", async function () {
       });
     });
   });
-  describe("/api/mushers", async function () {
-    describe("GET", async function () {
-      it("Responds with 200 and an object containing an array of all mushers", async function () {
+  // MUSHERS ***********************
+  describe("/api/mushers", async () => {
+    describe("GET", async () => {
+      it("Responds with 200 and an object containing an array of all mushers", async () => {
         const { status, body } = await request(app).get("/api/mushers");
 
         expect(status).to.equal(200);
         expect(body).to.haveOwnProperty("mushers");
         expect(body.mushers.length).to.equal(2);
       });
-      it("Mushers should have the expected keys including kennel name instead of id and dogCount", async function () {
+      it("Mushers should have the expected keys including kennel name instead of id and dogCount", async () => {
         const { status, body } = await request(app).get("/api/mushers");
         expect(body.mushers[0]).to.haveOwnProperty("dogCount");
         expect(body.mushers[0]).to.haveOwnProperty("kennel");
@@ -93,7 +95,7 @@ describe("/api", async function () {
           "nationality",
         ]);
       });
-      it("Should return mushers in alphabetical name order by default", async function () {
+      it("Should return mushers in alphabetical name order by default", async () => {
         const {
           status,
           body: { mushers },
@@ -101,7 +103,7 @@ describe("/api", async function () {
         console.log(mushers);
         expect(mushers).to.be.sortedBy("name");
       });
-      it.skip("Should return mushers sorted by given params", async function () {
+      it("Should return mushers sorted by given params", async () => {
         const {
           status,
           body: { mushers },
@@ -110,8 +112,8 @@ describe("/api", async function () {
         expect(mushers).to.be.sortedBy("dogCount", { descending: true });
       });
     });
-    describe("POST", async function () {
-      it("Responds with 201 and an object containing new musher", async function () {
+    describe("POST", async () => {
+      it("Responds with 201 and an object containing new musher", async () => {
         const { status, body } = await request(app).post("/api/mushers").send({
           name: "Jeremias",
           kennel: "Northern Soul Journeys",
@@ -121,7 +123,7 @@ describe("/api", async function () {
         expect(status).to.equal(201);
         expect(body).to.haveOwnProperty("musher");
       });
-      it("Mushers should have the expected keys including kennel name instead of id and dogCount", async function () {
+      it("Mushers should have the expected keys including kennel name instead of id and dogCount", async () => {
         const { status, body } = await request(app).get("/api/mushers");
         expect(body.mushers[0]).to.haveOwnProperty("dogCount");
         expect(body.mushers[0]).to.haveOwnProperty("kennel");
@@ -136,9 +138,9 @@ describe("/api", async function () {
       });
     });
 
-    describe("/api/mushers/:musher_id", function () {
-      describe("GET", function () {
-        it("Responds with 200 and a an object containing that mushers details, with a key of dog count representing the number of dogs in that mushers kennel", async function () {
+    describe("/api/mushers/:musher_id", () => {
+      describe("GET", () => {
+        it("Responds with 200 and a an object containing that mushers details, with a key of dog count representing the number of dogs in that mushers kennel", async () => {
           const { status, body } = await request(app).get("/api/mushers/2");
           expect(status).to.equal(200);
           expect(body).to.haveOwnProperty("musher");
@@ -152,8 +154,8 @@ describe("/api", async function () {
           });
         });
       });
-      describe("DELETE", function () {
-        it("Responds with 204, content not found and removes that musher from db", async function () {
+      describe("DELETE", () => {
+        it("Responds with 204, content not found and removes that musher from db", async () => {
           const { status } = await request(app).delete("/api/mushers/1");
           expect(status).to.equal(204);
           const response = await request(app).get("/api/mushers/1");
@@ -161,8 +163,8 @@ describe("/api", async function () {
           expect(response.body.msg).to.equal("Dog musher not found");
         });
       });
-      describe("PATCH", function () {
-        it("Responds with 201, created and returns updated dog musher", async function () {
+      describe("PATCH", () => {
+        it("Responds with 201, created and returns updated dog musher", async () => {
           const {
             status,
             body: { musher },
@@ -173,20 +175,20 @@ describe("/api", async function () {
           expect(musher.nationality).to.equal("British");
         });
       });
-      describe("ERRORS", function () {
-        it("Responds with 404 not found when searching for musher with non existent ID", async function () {
+      describe("ERRORS", () => {
+        it("Responds with 404 not found when searching for musher with non existent ID", async () => {
           const { status, body } = await request(app).get("/api/mushers/1000");
           expect(status).to.equal(404);
           expect(body.msg).to.equal("Dog musher not found");
         });
-        it("Responds with 404 not found when attempting to delete a musher with non existent ID", async function () {
+        it("Responds with 404 not found when attempting to delete a musher with non existent ID", async () => {
           const { status, body } = await request(app).delete(
             "/api/mushers/1000"
           );
           expect(status).to.equal(404);
           expect(body.msg).to.equal("Dog musher not found");
         });
-        it("Responds with 400 when invalid input type for id", async function () {
+        it("Responds with 400 when invalid input type for id", async () => {
           const methods = ["get", "delete"];
           const responses = methods.map(async (method) => {
             await request(app)[method]("/api/mushers/notAnID");
@@ -195,7 +197,7 @@ describe("/api", async function () {
             console.log(response);
           });
         });
-        it("Responds with 400 when missing data from post request", async function () {
+        it("Responds with 400 when missing data from post request", async () => {
           const { status, body } = await request(app)
             .post("/api/mushers")
             .send({ name: "Jeremias", nationality: "Swedish" });
@@ -203,7 +205,7 @@ describe("/api", async function () {
           expect(status).to.equal(400);
           expect(body.msg).to.equal("Request missing kennel name");
         });
-        it("Responds with 400 when missing data from post request", async function () {
+        it("Responds with 400 when missing data from post request", async () => {
           const { status, body } = await request(app)
             .post("/api/mushers")
             .send({ name: "Jeremias", kennel: "Northern Soul Journeys" });
@@ -211,7 +213,7 @@ describe("/api", async function () {
           expect(status).to.equal(400);
           expect(body.msg).to.equal("Incomplete request");
         });
-        it("Responds with 400 when tries to update non existent row", async function () {
+        it("Responds with 400 when tries to update non existent row", async () => {
           const { status, body } = await request(app)
             .patch("/api/mushers/1")
             .send({ notAColumn: "Jeremias" });
@@ -222,9 +224,10 @@ describe("/api", async function () {
         //   // sort mushers
       });
     });
-    describe("/api/kennels/:kennel_id/dogs", async function () {
-      describe("GET", async function () {
-        it("Responds with 200 and an object containing an array of all dogs in that kennel", async function () {
+    // DOGS *********************************
+    describe("/api/kennels/:kennel_id/dogs", async () => {
+      describe("GET", async () => {
+        it("Responds with 200 and an object containing an array of all dogs in that kennel", async () => {
           const { status, body } = await request(app).get(
             "/api/kennels/1/dogs"
           );
@@ -233,7 +236,7 @@ describe("/api", async function () {
           expect(body).to.haveOwnProperty("dogs");
           expect(body.dogs.length).to.equal(3);
         });
-        it("Dogs should have the expected keys including kennel name instead of kennel id  ", async function () {
+        it("Dogs should have the expected keys including kennel name instead of kennel id  ", async () => {
           const { body } = await request(app).get("/api/kennels/1/dogs");
 
           expect(body.dogs[0]).to.have.all.keys([
@@ -249,7 +252,7 @@ describe("/api", async function () {
             "team_position",
           ]);
         });
-        it("Accepts QUERIES and filters results by name, needs-booties, team_position, gender", async function () {
+        it("Accepts QUERIES and filters results by name, needs-booties, team_position, gender", async () => {
           const queries = [
             `name=shaggy`,
             `needs_booties=true`,
@@ -270,7 +273,7 @@ describe("/api", async function () {
           expect(position.body.dogs.length).to.equal(2);
           expect(gender.body.dogs.length).to.equal(3);
         });
-        it("Accepts an SORT by query which defaults to ascending", async function () {
+        it("Accepts an SORT by query which defaults to ascending", async () => {
           const orderByQueries = ["name", "km_ran", "birth_date"];
           const promises = await orderByQueries.map(async (query) => {
             return request(app).get(`/api/kennels/1/dogs?sort_by=${query}`);
@@ -284,7 +287,7 @@ describe("/api", async function () {
           });
           expect(responses[2].body.dogs).to.be.sortedBy("birth_date");
         });
-        it("Accepts an ORDER query", async function () {
+        it("Accepts an ORDER query", async () => {
           const orderByQueries = ["name", "km_ran", "birth_date"];
           const promises = await orderByQueries.map(async (query) => {
             return request(app).get(
@@ -305,7 +308,25 @@ describe("/api", async function () {
           });
         });
       });
-      describe.only("POST", async () => {
+      describe("GET DOG", () => {
+        it("responds with 200 and object containing given dogs details", async () => {
+          const { body, status } = await request(app).get("/api/dogs/2");
+          expect(status).to.equal(200);
+          expect(Object.keys(body.dog)).to.eql([
+            "name",
+            "dog_id",
+            "birth_date",
+            "gender",
+            "km_ran",
+            "kennel",
+            "display_pic",
+            "needs_booties",
+            "nickname",
+            "team_position",
+          ]);
+        });
+      });
+      describe("POST", async () => {
         it("responds with 201 and returns newly added dog", async () => {
           const response = await request(app).post("/api/kennels/1").send({
             name: "Moa",
@@ -329,6 +350,11 @@ describe("/api", async function () {
             "team_position",
             "gender",
           ]);
+        });
+      });
+      describe("PATCH", async () => {
+        it("should allow user to update dogs details and respond with updated dog", async () => {
+          const response = await request(app).patch("api/");
         });
       });
     });

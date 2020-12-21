@@ -1,4 +1,8 @@
-const { fetchDogsByKennelId, postDogToKennel } = require("../models/dogs");
+const {
+  fetchDogsByKennelId,
+  postDogToKennel,
+  fetchDogById,
+} = require("../models/dogs");
 
 exports.getDogsByKennelId = (req, res, next) => {
   const {
@@ -32,6 +36,15 @@ exports.addDogToKennel = (req, res, next) => {
   postDogToKennel(newDog)
     .then((dog) => {
       res.status(201).send({ dog });
+    })
+    .catch(next);
+};
+
+exports.getDogById = (req, res, next) => {
+  const { dog_id } = req.params;
+  fetchDogById(dog_id)
+    .then((dog) => {
+      res.status(200).send({ dog });
     })
     .catch(next);
 };
