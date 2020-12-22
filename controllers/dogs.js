@@ -2,6 +2,8 @@ const {
   fetchDogsByKennelId,
   postDogToKennel,
   fetchDogById,
+  patchDog,
+  postRun,
 } = require("../models/dogs");
 
 exports.getDogsByKennelId = (req, res, next) => {
@@ -47,4 +49,20 @@ exports.getDogById = (req, res, next) => {
       res.status(200).send({ dog });
     })
     .catch(next);
+};
+
+// exports.updateDog = (req, res, next) => {
+//   const update = req.body;
+//   const { dog_id } = req.params;
+//   patchDog(update, dog_id).then((dog) => {
+//     console.log(dog);
+//   });
+// };
+
+exports.addRun = (req, res, next) => {
+  const { dogs, km_ran } = req.body;
+  const { kennel_id } = req.params;
+  postRun(dogs, km_ran, kennel_id).then((dogs) => {
+    res.status(201).send({ dogs });
+  });
 };

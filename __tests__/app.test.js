@@ -352,9 +352,27 @@ describe("/api", async function () {
           ]);
         });
       });
-      describe("PATCH", async () => {
-        it("should allow user to update dogs details and respond with updated dog", async () => {
-          const response = await request(app).patch("api/");
+      describe("PATCH details", async () => {
+        it("should allow user increment dogs mileage", async () => {
+          const {
+            status,
+            body: { dog },
+          } = await request(app).patch("/api/dogs/1").send({ km_ran: 18 });
+          expect(status).to.equal(201);
+        });
+      });
+      describe.only("PATCH add km to multiple dogs", () => {
+        it("should allow user increment multiple dogs mileage", async () => {
+          const { status, body } = await request(app)
+            .post("/api/kennels/1/run")
+            .send({
+              dogs: [1, 2, 5],
+              km_ran: 18,
+            });
+
+          expect(status).to.equal(201);
+          expect(body.dogs.length).to.equal(3);
+          expect(body.dogs[0].km_ran).to.equal(198);
         });
       });
     });
