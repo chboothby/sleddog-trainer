@@ -103,7 +103,7 @@ describe("/api", async function () {
         console.log(mushers);
         expect(mushers).to.be.sortedBy("name");
       });
-      it("Should return mushers sorted by given params", async () => {
+      it.only("Should return mushers sorted by given params", async () => {
         const {
           status,
           body: { mushers },
@@ -353,26 +353,64 @@ describe("/api", async function () {
         });
       });
       describe("PATCH details", async () => {
-        it("should allow user increment dogs mileage", async () => {
+        it("should allow user alter dogs details", async () => {
           const {
             status,
             body: { dog },
-          } = await request(app).patch("/api/dogs/1").send({ km_ran: 18 });
+          } = await request(app)
+            .patch("/api/dogs/1")
+            .send({ needs_booties: true, team_position: "swing" });
           expect(status).to.equal(201);
         });
+        expect(status).to.equal(201);
+        expect(dog.needs_booties).to.equal(true);
+        expect(dog.team_position).to.equal("swing");
       });
-      describe.only("PATCH add km to multiple dogs", () => {
+    });
+    describe("/api/runs/:kennel_id", async () => {
+      describe("PATCH add km to multiple dogs", () => {
         it("should allow user increment multiple dogs mileage", async () => {
           const { status, body } = await request(app)
-            .post("/api/kennels/1/run")
+            .post("/api/kennels/1/runs")
             .send({
               dogs: [1, 2, 5],
-              km_ran: 18,
+              km_ran: 12,
+              mushers: [1],
+              route: "mountain circuit",
             });
 
           expect(status).to.equal(201);
-          expect(body.dogs.length).to.equal(3);
-          expect(body.dogs[0].km_ran).to.equal(198);
+          expect(body.newRun.dogs.length).to.equal(3);
+          expect(body.newRun.dogs[0].km_ran).to.equal(192);
+        });
+        it("should return the new run within the object", async () => {
+          const { status, body } = await request(app)
+            .post("/api/kennels/1/runs")
+            .send({
+              dogs: [1, 2, 5],
+              km_ran: 12,
+              mushers: [1],
+              route: "mountain circuit",
+            });
+          expect(Object.keys(body.newRun.run)).to.eql([
+            "run_id",
+            "route",
+            "kennel_id",
+            "dogs",
+            "mushers",
+            "distance",
+          ]);
+        });
+      });
+      describe("GET", () => {
+        it("returns 200 and array of dogs", async () => {
+          const {
+            status,
+            body: { runs },
+          } = await request(app).get("/api/kennels/1/runs");
+
+          expect(status).to.equal(200);
+          expect(runs.length).to.equal(1);
         });
       });
     });

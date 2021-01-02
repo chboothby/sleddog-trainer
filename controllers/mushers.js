@@ -7,7 +7,7 @@ const {
 } = require("../models/mushers");
 
 exports.getAllMushers = (req, res, next) => {
-  const { sort_by, order } = req.params;
+  const { sort_by, order } = req.query;
   fetchAllMushers(sort_by, order)
     .then((mushers) => {
       res.status(200).send({ mushers });

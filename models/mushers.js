@@ -1,6 +1,7 @@
 const connection = require("../db/connection");
 
 exports.fetchAllMushers = (sort_by, order) => {
+  sort_by === "dogs" ? (sort_by = "dogCount") : null;
   return connection
     .select(
       "musher_id",
