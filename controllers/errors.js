@@ -1,5 +1,5 @@
 exports.handlePSQLErrors = (err, req, res, next) => {
-  console.log(err);
+  // console.log(err);
   const codes = {
     "22P02": { status: 400, msg: "Invalid input type" },
     42703: { status: 400, msg: "Invalid input type" },
@@ -14,7 +14,7 @@ exports.handlePSQLErrors = (err, req, res, next) => {
 };
 exports.handleCustomErrors = (err, req, res, next) => {
   if (err.status) {
-    console.log("custom err");
+    // console.log("custom err");
     res.status(err.status).send({ msg: err.msg });
   } else next(err);
 };

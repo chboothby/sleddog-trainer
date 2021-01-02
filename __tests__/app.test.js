@@ -29,7 +29,7 @@ describe("/api", async function () {
       it("Each kennel should have a property dogCount which represents the number of dogs living in that kennel", async () => {
         return request(app)
           .get("/api/kennels")
-          .then(({ status, body }) => {
+          .then(({ body }) => {
             expect(body.kennels[0]).to.have.ownProperty("dogCount");
             expect(body.kennels[0].dogCount).to.equal("3");
           });
@@ -83,7 +83,7 @@ describe("/api", async function () {
         expect(body.mushers.length).to.equal(2);
       });
       it("Mushers should have the expected keys including kennel name instead of id and dogCount", async () => {
-        const { status, body } = await request(app).get("/api/mushers");
+        const { body } = await request(app).get("/api/mushers");
         expect(body.mushers[0]).to.haveOwnProperty("dogCount");
         expect(body.mushers[0]).to.haveOwnProperty("kennel");
         expect(body.mushers[0]).to.have.all.keys([
@@ -97,18 +97,14 @@ describe("/api", async function () {
       });
       it("Should return mushers in alphabetical name order by default", async () => {
         const {
-          status,
           body: { mushers },
         } = await request(app).get("/api/mushers");
-        console.log(mushers);
         expect(mushers).to.be.sortedBy("name");
       });
       it("Should return mushers sorted by given params", async () => {
         const {
-          status,
           body: { mushers },
         } = await request(app).get("/api/mushers?sort_by=dogs&order=desc");
-        console.log(mushers);
         expect(mushers).to.be.sortedBy("dogCount", { descending: true });
       });
     });
@@ -124,7 +120,7 @@ describe("/api", async function () {
         expect(body).to.haveOwnProperty("musher");
       });
       it("Mushers should have the expected keys including kennel name instead of id and dogCount", async () => {
-        const { status, body } = await request(app).get("/api/mushers");
+        const { body } = await request(app).get("/api/mushers");
         expect(body.mushers[0]).to.haveOwnProperty("dogCount");
         expect(body.mushers[0]).to.haveOwnProperty("kennel");
         expect(body.mushers[0]).to.have.all.keys([
@@ -367,7 +363,7 @@ describe("/api", async function () {
     });
   });
   // RUNS  ********************
-  describe.only("/api/kennels/:kennel_id/runs", async () => {
+  describe("/api/kennels/:kennel_id/runs", async () => {
     describe("PATCH add km to multiple dogs", () => {
       it("should allow user increment multiple dogs mileage", async () => {
         const { status, body } = await request(app)
@@ -385,7 +381,7 @@ describe("/api", async function () {
         expect(body.newRun.dogs[0].km_ran).to.equal(192);
       });
       it("should return the new run within the object", async () => {
-        const { status, body } = await request(app)
+        const { body } = await request(app)
           .post("/api/kennels/1/runs")
           .send({
             dogs: [1, 2, 5],
@@ -414,8 +410,10 @@ describe("/api", async function () {
 
         expect(status).to.equal(200);
         expect(runs.length).to.equal(1);
-        console.log(runs);
       });
     });
   });
+  // delete run by run id, patch run by run id
+  // sort runs by distance ?by dog id, date
+  // errors
 });
