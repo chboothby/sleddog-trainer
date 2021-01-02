@@ -12,13 +12,22 @@ exports.addKennelId = (data, kennelRef) => {
   });
 };
 
-exports.formatDate = (dogs) => {
-  return dogs.map(({ birth_date, ...rest }) => {
-    const date = birth_date.split("/");
-    const newDate = new Date(date[2], date[1], date[0]);
-    return {
-      ...rest,
-      birth_date: newDate,
-    };
-  });
+exports.formatDate = (data) => {
+  return data[0].birth_date
+    ? data.map(({ birth_date, ...rest }) => {
+        const date = birth_date.split("/");
+        const newDate = new Date(date[2], date[1], date[0]);
+        return {
+          ...rest,
+          birth_date: newDate,
+        };
+      })
+    : data.map(({ date, ...rest }) => {
+        const d = date.split("/");
+        const newDate = new Date(d[2], d[1], d[0]);
+        return {
+          ...rest,
+          date: newDate,
+        };
+      });
 };

@@ -1,4 +1,4 @@
-const { kennelData, musherData, dogData } = require("../data/index");
+const { kennelData, musherData, dogData, runData } = require("../data/index");
 const {
   createKennelRef,
   addKennelId,
@@ -27,5 +27,9 @@ exports.seed = (knex) => {
 
       const addDogs = knex.insert(formattedDogs).into("dogs").returning("*");
       return Promise.all([addMushers, addDogs]);
+    })
+    .then(() => {
+      const formattedRuns = formatDate(runData);
+      return knex.insert(runData).into("runs").returning("*");
     });
 };
