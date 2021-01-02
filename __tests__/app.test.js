@@ -103,7 +103,7 @@ describe("/api", async function () {
         console.log(mushers);
         expect(mushers).to.be.sortedBy("name");
       });
-      it.only("Should return mushers sorted by given params", async () => {
+      it("Should return mushers sorted by given params", async () => {
         const {
           status,
           body: { mushers },
@@ -224,194 +224,197 @@ describe("/api", async function () {
         //   // sort mushers
       });
     });
-    // DOGS *********************************
-    describe("/api/kennels/:kennel_id/dogs", async () => {
-      describe("GET", async () => {
-        it("Responds with 200 and an object containing an array of all dogs in that kennel", async () => {
-          const { status, body } = await request(app).get(
-            "/api/kennels/1/dogs"
+  });
+  // DOGS *********************************
+  describe("/api/kennels/:kennel_id/dogs", async () => {
+    describe("GET", async () => {
+      it("Responds with 200 and an object containing an array of all dogs in that kennel", async () => {
+        const { status, body } = await request(app).get("/api/kennels/1/dogs");
+
+        expect(status).to.equal(200);
+        expect(body).to.haveOwnProperty("dogs");
+        expect(body.dogs.length).to.equal(3);
+      });
+      it("Dogs should have the expected keys including kennel name instead of kennel id  ", async () => {
+        const { body } = await request(app).get("/api/kennels/1/dogs");
+
+        expect(body.dogs[0]).to.have.all.keys([
+          "dog_id",
+          "birth_date",
+          "display_pic",
+          "gender",
+          "kennel",
+          "km_ran",
+          "name",
+          "needs_booties",
+          "nickname",
+          "team_position",
+        ]);
+      });
+      it("Accepts QUERIES and filters results by name, needs-booties, team_position, gender", async () => {
+        const queries = [
+          `name=shaggy`,
+          `needs_booties=true`,
+          `team_position=wheel`,
+          "gender=male",
+        ];
+        const promisesArray = await queries.map(async (query) => {
+          return request(app).get(`/api/kennels/1/dogs?${query}`);
+        });
+        const [name, booties, position, gender] = await Promise.all(
+          promisesArray
+        );
+        expect(name.body.dogs.length).to.equal(1);
+        expect(name.body.dogs[0].name).to.equal("Shaggy");
+
+        expect(booties.body.dogs.length).to.equal(0);
+
+        expect(position.body.dogs.length).to.equal(2);
+        expect(gender.body.dogs.length).to.equal(3);
+      });
+      it("Accepts an SORT by query which defaults to ascending", async () => {
+        const orderByQueries = ["name", "km_ran", "birth_date"];
+        const promises = await orderByQueries.map(async (query) => {
+          return request(app).get(`/api/kennels/1/dogs?sort_by=${query}`);
+        });
+
+        const responses = await Promise.all(promises);
+
+        expect(responses[0].body.dogs).to.be.sortedBy("name");
+        expect(responses[1].body.dogs).to.be.sortedBy("km_ran", {
+          coerce: true,
+        });
+        expect(responses[2].body.dogs).to.be.sortedBy("birth_date");
+      });
+      it("Accepts an ORDER query", async () => {
+        const orderByQueries = ["name", "km_ran", "birth_date"];
+        const promises = await orderByQueries.map(async (query) => {
+          return request(app).get(
+            `/api/kennels/1/dogs?sort_by=${query}&order=desc`
           );
-
-          expect(status).to.equal(200);
-          expect(body).to.haveOwnProperty("dogs");
-          expect(body.dogs.length).to.equal(3);
         });
-        it("Dogs should have the expected keys including kennel name instead of kennel id  ", async () => {
-          const { body } = await request(app).get("/api/kennels/1/dogs");
 
-          expect(body.dogs[0]).to.have.all.keys([
-            "dog_id",
-            "birth_date",
-            "display_pic",
-            "gender",
-            "kennel",
-            "km_ran",
-            "name",
-            "needs_booties",
-            "nickname",
-            "team_position",
-          ]);
+        const responses = await Promise.all(promises);
+
+        expect(responses[0].body.dogs).to.be.sortedBy("name", {
+          descending: true,
         });
-        it("Accepts QUERIES and filters results by name, needs-booties, team_position, gender", async () => {
-          const queries = [
-            `name=shaggy`,
-            `needs_booties=true`,
-            `team_position=wheel`,
-            "gender=male",
-          ];
-          const promisesArray = await queries.map(async (query) => {
-            return request(app).get(`/api/kennels/1/dogs?${query}`);
-          });
-          const [name, booties, position, gender] = await Promise.all(
-            promisesArray
-          );
-          expect(name.body.dogs.length).to.equal(1);
-          expect(name.body.dogs[0].name).to.equal("Shaggy");
-
-          expect(booties.body.dogs.length).to.equal(0);
-
-          expect(position.body.dogs.length).to.equal(2);
-          expect(gender.body.dogs.length).to.equal(3);
+        expect(responses[1].body.dogs).to.be.sortedBy("km_ran", {
+          descending: true,
         });
-        it("Accepts an SORT by query which defaults to ascending", async () => {
-          const orderByQueries = ["name", "km_ran", "birth_date"];
-          const promises = await orderByQueries.map(async (query) => {
-            return request(app).get(`/api/kennels/1/dogs?sort_by=${query}`);
-          });
-
-          const responses = await Promise.all(promises);
-
-          expect(responses[0].body.dogs).to.be.sortedBy("name");
-          expect(responses[1].body.dogs).to.be.sortedBy("km_ran", {
-            coerce: true,
-          });
-          expect(responses[2].body.dogs).to.be.sortedBy("birth_date");
+        expect(responses[2].body.dogs).to.be.sortedBy("birth_date", {
+          descending: true,
         });
-        it("Accepts an ORDER query", async () => {
-          const orderByQueries = ["name", "km_ran", "birth_date"];
-          const promises = await orderByQueries.map(async (query) => {
-            return request(app).get(
-              `/api/kennels/1/dogs?sort_by=${query}&order=desc`
-            );
-          });
-
-          const responses = await Promise.all(promises);
-
-          expect(responses[0].body.dogs).to.be.sortedBy("name", {
-            descending: true,
-          });
-          expect(responses[1].body.dogs).to.be.sortedBy("km_ran", {
-            descending: true,
-          });
-          expect(responses[2].body.dogs).to.be.sortedBy("birth_date", {
-            descending: true,
-          });
-        });
-      });
-      describe("GET DOG", () => {
-        it("responds with 200 and object containing given dogs details", async () => {
-          const { body, status } = await request(app).get("/api/dogs/2");
-          expect(status).to.equal(200);
-          expect(Object.keys(body.dog)).to.eql([
-            "name",
-            "dog_id",
-            "birth_date",
-            "gender",
-            "km_ran",
-            "kennel",
-            "display_pic",
-            "needs_booties",
-            "nickname",
-            "team_position",
-          ]);
-        });
-      });
-      describe("POST", async () => {
-        it("responds with 201 and returns newly added dog", async () => {
-          const response = await request(app).post("/api/kennels/1").send({
-            name: "Moa",
-            birth_date: "17/3/2016",
-            nickname: "Tiny Ol' Moa",
-            team_position: "lead",
-            gender: "female",
-            km_ran: 102,
-          });
-
-          expect(response.status).to.equal(201);
-          expect(Object.keys(response.body.dog)).to.eql([
-            "dog_id",
-            "name",
-            "nickname",
-            "kennel_id",
-            "display_pic",
-            "birth_date",
-            "km_ran",
-            "needs_booties",
-            "team_position",
-            "gender",
-          ]);
-        });
-      });
-      describe("PATCH details", async () => {
-        it("should allow user alter dogs details", async () => {
-          const {
-            status,
-            body: { dog },
-          } = await request(app)
-            .patch("/api/dogs/1")
-            .send({ needs_booties: true, team_position: "swing" });
-          expect(status).to.equal(201);
-        });
-        expect(status).to.equal(201);
-        expect(dog.needs_booties).to.equal(true);
-        expect(dog.team_position).to.equal("swing");
       });
     });
-    describe("/api/runs/:kennel_id", async () => {
-      describe("PATCH add km to multiple dogs", () => {
-        it("should allow user increment multiple dogs mileage", async () => {
-          const { status, body } = await request(app)
-            .post("/api/kennels/1/runs")
-            .send({
-              dogs: [1, 2, 5],
-              km_ran: 12,
-              mushers: [1],
-              route: "mountain circuit",
-            });
-
-          expect(status).to.equal(201);
-          expect(body.newRun.dogs.length).to.equal(3);
-          expect(body.newRun.dogs[0].km_ran).to.equal(192);
-        });
-        it("should return the new run within the object", async () => {
-          const { status, body } = await request(app)
-            .post("/api/kennels/1/runs")
-            .send({
-              dogs: [1, 2, 5],
-              km_ran: 12,
-              mushers: [1],
-              route: "mountain circuit",
-            });
-          expect(Object.keys(body.newRun.run)).to.eql([
-            "run_id",
-            "route",
-            "kennel_id",
-            "dogs",
-            "mushers",
-            "distance",
-          ]);
-        });
+    describe("GET DOG", () => {
+      it("responds with 200 and object containing given dogs details", async () => {
+        const { body, status } = await request(app).get("/api/dogs/2");
+        expect(status).to.equal(200);
+        expect(Object.keys(body.dog)).to.eql([
+          "name",
+          "dog_id",
+          "birth_date",
+          "gender",
+          "km_ran",
+          "kennel",
+          "display_pic",
+          "needs_booties",
+          "nickname",
+          "team_position",
+        ]);
       });
-      describe("GET", () => {
-        it("returns 200 and array of dogs", async () => {
-          const {
-            status,
-            body: { runs },
-          } = await request(app).get("/api/kennels/1/runs");
-
-          expect(status).to.equal(200);
-          expect(runs.length).to.equal(1);
+    });
+    describe("POST", async () => {
+      it("responds with 201 and returns newly added dog", async () => {
+        const response = await request(app).post("/api/kennels/1").send({
+          name: "Moa",
+          birth_date: "17/3/2016",
+          nickname: "Tiny Ol' Moa",
+          team_position: "lead",
+          gender: "female",
+          km_ran: 102,
         });
+
+        expect(response.status).to.equal(201);
+        expect(Object.keys(response.body.dog)).to.eql([
+          "dog_id",
+          "name",
+          "nickname",
+          "kennel_id",
+          "display_pic",
+          "birth_date",
+          "km_ran",
+          "needs_booties",
+          "team_position",
+          "gender",
+        ]);
+      });
+    });
+    describe("PATCH details", async () => {
+      it("should allow user alter dogs details", async () => {
+        const {
+          status,
+          body: { dog },
+        } = await request(app)
+          .patch("/api/dogs/1")
+          .send({ needs_booties: true, team_position: "swing" });
+        expect(status).to.equal(201);
+      });
+      expect(status).to.equal(201);
+      expect(dog.needs_booties).to.equal(true);
+      expect(dog.team_position).to.equal("swing");
+    });
+  });
+  // RUNS  ********************
+  describe.only("/api/kennels/:kennel_id/runs", async () => {
+    describe("PATCH add km to multiple dogs", () => {
+      it("should allow user increment multiple dogs mileage", async () => {
+        const { status, body } = await request(app)
+          .post("/api/kennels/1/runs")
+          .send({
+            dogs: [1, 2, 5],
+            km_ran: 12,
+            mushers: [1],
+            route: "mountain circuit",
+            date: "11/12/20",
+          });
+
+        expect(status).to.equal(201);
+        expect(body.newRun.dogs.length).to.equal(3);
+        expect(body.newRun.dogs[0].km_ran).to.equal(192);
+      });
+      it("should return the new run within the object", async () => {
+        const { status, body } = await request(app)
+          .post("/api/kennels/1/runs")
+          .send({
+            dogs: [1, 2, 5],
+            km_ran: 12,
+            mushers: [1],
+            route: "mountain circuit",
+            date: "11/12/20",
+          });
+        expect(Object.keys(body.newRun.run)).to.eql([
+          "run_id",
+          "route",
+          "kennel_id",
+          "dogs",
+          "distance",
+          "date",
+          "mushers",
+        ]);
+      });
+    });
+    describe("GET", () => {
+      it("returns 200 and array of dogs", async () => {
+        const {
+          status,
+          body: { runs },
+        } = await request(app).get("/api/kennels/1/runs");
+
+        expect(status).to.equal(200);
+        expect(runs.length).to.equal(1);
+        console.log(runs);
       });
     });
   });

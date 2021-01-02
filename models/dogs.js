@@ -1,4 +1,3 @@
-const { request } = require("express");
 const connection = require("../db/connection");
 
 exports.fetchDogsByKennelId = (
@@ -74,26 +73,9 @@ exports.fetchDogById = (dog_id) => {
     });
 };
 
-// exports.patchDog = (update, dog_id) => {
-//   const { km_ran } = update;
-//   console.log(km_ran);
-//   return km_ran ? connection("dogs").increment("km_ran", km_ran) : null;
-// };
-
-exports.postRun = async (dogs, km_ran, kennel_id) => {
-  // update each dogs milage
-  const dogsPromises = await dogs.map((dog) => {
-    return connection("dogs")
-      .increment({ km_ran })
-      .where("dogs.dog_id", "=", dog)
-      .returning("*");
-  });
-  // iterate over each updated dog and add them to new array
-  const updatedDogs = [];
-  return Promise.all(dogsPromises).then((response) => {
-    response.forEach((dogArr, index) => {
-      updatedDogs.push(dogArr[0]);
-    });
-    return updatedDogs;
-  });
+exports.patchDog = (update, dog_id) => {
+  return connection("dogs")
+    .update(update)
+    .where("dogs.dog_id", "=", dog_id)
+    .returning("*");
 };
