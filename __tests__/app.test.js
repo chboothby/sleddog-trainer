@@ -1,6 +1,7 @@
 const app = require("../app");
 const request = require("supertest");
 const connection = require("../db/connection");
+const { response } = require("express");
 const chai = require("chai"),
   expect = chai.expect;
 
@@ -360,6 +361,62 @@ describe("/api", async function () {
       expect(status).to.equal(201);
       expect(dog.needs_booties).to.equal(true);
       expect(dog.team_position).to.equal("swing");
+    });
+    describe("ERRORS", () => {
+      describe("/api/dogs/:dog_id", () => {
+        it("400 PATCH", async () => {
+          const {
+            status,
+            body: { msg },
+          } = await request(app).patch("/api/dogs/1");
+
+          expect(status).to.equal(400);
+          expect(msg).to.equal("Empty request body");
+        });
+        it("400 PATCH", async () => {
+          const {
+            status,
+            body: { msg },
+          } = await request(app)
+            .patch("/api/dogs/1")
+            .send({ km_ran: "notANumber" });
+
+          expect(status).to.equal(400);
+          expect(msg).to.equal("Invalid input type");
+        });
+        it("404 GET dog not found", async () => {
+          const {
+            status,
+            body: { msg },
+          } = await request(app).get("/api/dogs/1000");
+          expect(status).to.equal(404);
+          expect(msg).to.equal("Dog not found");
+        });
+
+        it("400 GET bad request", async () => {
+          const {
+            status,
+            body: { msg },
+          } = await request(app).get("/api/dogs/notAnId");
+
+          expect(status).to.equal(400);
+          expect(msg).to.equal("Invalid input type");
+        });
+        it("405 invalid method", async () => {
+          const methods = ["post", "delete"];
+          const promises = await methods.map((method) => {
+            return request(app)[method]("/api/dogs/2");
+          });
+
+          const responses = await Promise.all(promises);
+          expect(responses.every(({ status }) => status === 405)).to.equal(
+            true
+          );
+          expect(
+            responses.every(({ body: { msg } }) => msg === "Invalid method")
+          ).to.equal(true);
+        });
+      });
     });
   });
   // RUNS  ********************

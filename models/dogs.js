@@ -74,6 +74,9 @@ exports.fetchDogById = (dog_id) => {
 };
 
 exports.patchDog = (update, dog_id) => {
+  if (Object.keys(update).length === 0) {
+    return Promise.reject({ status: 400, msg: "Empty request body" });
+  }
   return connection("dogs")
     .update(update)
     .where("dogs.dog_id", "=", dog_id)

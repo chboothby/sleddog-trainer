@@ -46,6 +46,7 @@ exports.getDogById = (req, res, next) => {
   const { dog_id } = req.params;
   fetchDogById(dog_id)
     .then((dog) => {
+      if (!dog) return Promise.reject({ status: 404, msg: "Dog not found" });
       res.status(200).send({ dog });
     })
     .catch(next);
