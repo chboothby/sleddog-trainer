@@ -420,8 +420,8 @@ describe("/api", async function () {
     });
   });
   // RUNS  ********************
-  describe("/api/kennels/:kennel_id/runs", async () => {
-    describe("PATCH add km to multiple dogs", () => {
+  describe("/api/kennels/:kennel_id/runs || /api/runs/:run_id", async () => {
+    describe("POST add km to multiple dogs", () => {
       it("should allow user increment multiple dogs mileage", async () => {
         const { status, body } = await request(app)
           .post("/api/kennels/1/runs")
@@ -469,8 +469,23 @@ describe("/api", async function () {
         expect(runs.length).to.equal(1);
       });
     });
+    describe("DELETE", () => {
+      it("responds with 204 removes run from database", async () => {
+        const {status} = await request(app).delete("/api/runs/1");
+
+        expect(status).to.equal(204);
+      });
+    });
+    describe("PATCH", () => {
+      it("responds with 201 and returns updated run", async () => {
+        const {status, body: {run}} = await request(app).patch("/api/runs/1").send({route: "dirt road", dogs: [3, 4]});
+        expect(status).to.equal(201);
+        expect(run.route).to.equal("dirt road");
+        expect(run.dogs).to.eql([3, 4]);
+        });
+    });
   });
-  // delete run by run id, patch run by run id
+
   // sort runs by distance ?by dog id, date
   // errors
 });

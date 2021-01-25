@@ -1,4 +1,4 @@
-const { postRun, fetchRuns } = require("../models/runs");
+const { postRun, fetchRuns, deleteRunById, patchRunById } = require("../models/runs");
 
 exports.addRun = (req, res, next) => {
   const { dogs, km_ran, mushers, route, date } = req.body;
@@ -25,4 +25,21 @@ exports.getRuns = (req, res, next) => {
       res.status(200).send({ runs });
     })
     .catch(next);
+};
+
+exports.removeRunById = (req, res, next) => {
+  const {run_id} = req.params;
+  deleteRunById(run_id).then(() => {
+    res.status(204).send();
+  })
+  .catch(next);
+};
+
+exports.updateRunById = (req, res, next) => {
+  const updates = req.body;
+  const {run_id} = req.params;
+  patchRunById(run_id, updates).then(run => {
+    res.status(201).send({run});
+  })
+  .catch(next);
 };

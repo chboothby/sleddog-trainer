@@ -12,6 +12,7 @@ exports.handlePSQLErrors = (err, req, res, next) => {
     res.status(codes[code].status).send({ msg: codes[code].msg });
   } else next(err);
 };
+
 exports.handleCustomErrors = (err, req, res, next) => {
   if (err.status) {
     // console.log("custom err");
@@ -22,6 +23,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
 exports.handleInternalErrors = (err, req, res, next) => {
   res.status(500).send({ msg: "Internal server error" });
 };
+
 exports.send404 = (req, res, next) => {
   res.status(404).send({ msg: "Not found" });
 };
