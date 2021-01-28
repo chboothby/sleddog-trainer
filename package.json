@@ -45,6 +45,9 @@
     "chai-datetime": "^1.7.0",
     "chai-sorted": "^0.2.0",
     "express": "^4.17.1",
+    "express-jwt": "^6.0.0",
+    "express-jwt-authz": "^2.4.1",
+    "jwks-rsa": "^1.12.2",
     "knex": "^0.21.12",
     "pg": "^8.5.1"
   }
