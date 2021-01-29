@@ -32,7 +32,7 @@ describe('/api', async function () {
           .get('/api/kennels')
           .then(({ body }) => {
             expect(body.kennels[0]).to.have.ownProperty('dogCount');
-            expect(body.kennels[0].dogCount).to.equal('3');
+            expect(body.kennels[0].dogCount).to.equal('12');
           });
       });
     });
@@ -230,7 +230,7 @@ describe('/api', async function () {
 
         expect(status).to.equal(200);
         expect(body).to.haveOwnProperty('dogs');
-        expect(body.dogs.length).to.equal(3);
+        expect(body.dogs.length).to.equal(12);
       });
       it('Dogs should have the expected keys including kennel name instead of kennel id  ', async () => {
         const { body } = await request(app).get('/api/kennels/1/dogs');
@@ -244,7 +244,6 @@ describe('/api', async function () {
           'km_ran',
           'name',
           'needs_booties',
-          'nickname',
           'team_position',
         ]);
       });
@@ -266,8 +265,8 @@ describe('/api', async function () {
 
         expect(booties.body.dogs.length).to.equal(0);
 
-        expect(position.body.dogs.length).to.equal(2);
-        expect(gender.body.dogs.length).to.equal(3);
+        expect(position.body.dogs.length).to.equal(5);
+        expect(gender.body.dogs.length).to.equal(8);
       });
       it('Accepts an SORT by query which defaults to ascending', async () => {
         const orderByQueries = ['name', 'km_ran', 'birth_date'];
@@ -317,7 +316,6 @@ describe('/api', async function () {
           'kennel',
           'display_pic',
           'needs_booties',
-          'nickname',
           'team_position',
         ]);
       });
@@ -327,7 +325,6 @@ describe('/api', async function () {
         const response = await request(app).post('/api/kennels/1').send({
           name: 'Moa',
           birth_date: '17/3/2016',
-          nickname: "Tiny Ol' Moa",
           team_position: 'lead',
           gender: 'female',
           km_ran: 102,
@@ -337,7 +334,6 @@ describe('/api', async function () {
         expect(Object.keys(response.body.dog)).to.eql([
           'dog_id',
           'name',
-          'nickname',
           'kennel_id',
           'display_pic',
           'birth_date',
@@ -435,7 +431,7 @@ describe('/api', async function () {
 
         expect(status).to.equal(201);
         expect(body.newRun.dogs.length).to.equal(3);
-        expect(body.newRun.dogs[0].km_ran).to.equal(192);
+        expect(body.newRun.dogs[0].km_ran).to.equal(457);
       });
       it('should return the new run within the object', async () => {
         const { body } = await request(app)
