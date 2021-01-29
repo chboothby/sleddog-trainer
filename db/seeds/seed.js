@@ -1,9 +1,9 @@
-const { kennelData, musherData, dogData, runData } = require("../data/index");
+const { kennelData, musherData, dogData, runData } = require('../data/index');
 const {
   createKennelRef,
   addKennelId,
   formatDate,
-} = require("../utils/data-manipulation");
+} = require('../utils/data-manipulation');
 
 exports.seed = (knex) => {
   return knex.migrate
@@ -12,7 +12,7 @@ exports.seed = (knex) => {
       return knex.migrate.latest();
     })
     .then(() => {
-      return knex.insert(kennelData).into("kennels").returning("*");
+      return knex.insert(kennelData).into('kennels').returning('*');
     })
     .then((kennelRows) => {
       const kennelRef = createKennelRef(kennelRows);
@@ -22,14 +22,14 @@ exports.seed = (knex) => {
 
       const addMushers = knex
         .insert(formattedMushers)
-        .into("mushers")
-        .returning("*");
+        .into('mushers')
+        .returning('*');
 
-      const addDogs = knex.insert(formattedDogs).into("dogs").returning("*");
+      const addDogs = knex.insert(formattedDogs).into('dogs').returning('*');
       return Promise.all([addMushers, addDogs]);
     })
     .then(() => {
       const formattedRuns = formatDate(runData);
-      return knex.insert(runData).into("runs").returning("*");
+      return knex.insert(formattedRuns).into('runs').returning('*');
     });
 };

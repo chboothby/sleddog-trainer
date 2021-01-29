@@ -1,7 +1,7 @@
-const ENV = process.env.NODE_ENV || "development";
+const ENV = process.env.NODE_ENV || 'development';
 
-const test = require("./test-data");
-const development = require("./development-data");
+const test = require('./test-data');
+const development = require('./development-data');
 
 const data = {
   development,
@@ -9,4 +9,4 @@ const data = {
   production: development,
 };
 
-module.exports = data["test"];
+module.exports = data[ENV];

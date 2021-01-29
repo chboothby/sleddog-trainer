@@ -21,7 +21,7 @@ module.exports = [
     dogs: [12, 13, 14],
     mushers: [1],
     distance: 17,
-    date: '17/1/20',
+    date: '12/01/20',
   },
   {
     route: 'forest road',
@@ -29,7 +29,7 @@ module.exports = [
     dogs: [5, 6, 7],
     mushers: [1],
     distance: 12,
-    date: '28/1/20',
+    date: '28/01/20',
   },
   {
     route: '17 loop',
@@ -37,7 +37,7 @@ module.exports = [
     dogs: [8, 9, 10],
     mushers: [1],
     distance: 17,
-    date: '1/2/20',
+    date: '01/02/20',
   },
   {
     route: 'forest road',
@@ -45,7 +45,7 @@ module.exports = [
     dogs: [11, 12, 13, 14],
     mushers: [1],
     distance: 12,
-    date: '10/2/20',
+    date: '10/02/20',
   },
   {
     route: 'forest road',
