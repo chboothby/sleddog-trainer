@@ -16,9 +16,7 @@ exports.formatDate = (data) => {
   return data[0].birth_date
     ? data.map(({ birth_date, ...rest }) => {
         const date = birth_date.split('/');
-        console.log(date);
         const newDate = new Date(date[2], date[1], date[0]);
-        console.log(newDate);
         return {
           ...rest,
           birth_date: newDate,
@@ -30,7 +28,6 @@ exports.formatDate = (data) => {
           d[2] = '20' + d[2];
         }
         const newDate = new Date(d[2], d[1], d[0]);
-        console.log(newDate);
         return {
           ...rest,
           date: newDate,

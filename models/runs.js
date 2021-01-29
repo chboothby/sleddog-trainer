@@ -48,8 +48,8 @@ exports.fetchRuns = async (kennel_id, { dateFrom, dateTo }) => {
     .modify((queryBuilder) => {
       if (dateFrom || dateTo) {
         queryBuilder.whereBetween('date', [
-          dateFrom || '01/01/2000',
-          dateTo || new Date(),
+          dateTo || '01/01/2000',
+          dateFrom || new Date(),
         ]);
       }
     });
@@ -60,8 +60,8 @@ exports.fetchRuns = async (kennel_id, { dateFrom, dateTo }) => {
     .modify((queryBuilder) => {
       if (dateFrom || dateTo) {
         queryBuilder.whereBetween('date', [
-          dateFrom || '01/01/2000',
-          dateTo || new Date(),
+          dateTo || '01/01/2000',
+          dateFrom || new Date(),
         ]);
       }
     });
@@ -92,8 +92,8 @@ exports.fetchRunsByDog = async (dog_id, { dateTo, dateFrom }) => {
     .modify((queryBuilder) => {
       if (dateFrom || dateTo) {
         queryBuilder.whereBetween('date', [
-          dateFrom || '01/01/2000',
-          dateTo || new Date(),
+          dateTo || '01/01/2000',
+          dateFrom || new Date(),
         ]);
       }
     });
@@ -103,8 +103,8 @@ exports.fetchRunsByDog = async (dog_id, { dateTo, dateFrom }) => {
     .modify((queryBuilder) => {
       if (dateFrom || dateTo) {
         queryBuilder.whereBetween('date', [
-          dateFrom || '01/01/2000',
-          dateTo || new Date(),
+          dateTo || '01/01/2000',
+          dateFrom || new Date(),
         ]);
       }
     });
