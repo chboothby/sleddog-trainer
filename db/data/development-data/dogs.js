@@ -1,7 +1,6 @@
 module.exports = [
   {
     name: 'Frost',
-    nickname: 'fluffyboi',
     kennel: 'Northern Soul Journeys',
     birth_date: '10/2/2017',
     km_ran: 180,
@@ -10,7 +9,6 @@ module.exports = [
   },
   {
     name: 'Njalla',
-    nickname: 'bigboss',
     kennel: 'Northern Soul Journeys',
     birth_date: '6/6/2012',
     km_ran: 398,
@@ -35,7 +33,6 @@ module.exports = [
   },
   {
     name: 'Shaggy',
-    nickname: 'swaggly',
     kennel: 'Northern Soul Journeys',
     birth_date: '20/8/2014',
     km_ran: 101,
