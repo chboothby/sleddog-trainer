@@ -33,13 +33,13 @@ exports.fetchRuns = async (kennel_id, { dateFrom, dateTo }) => {
     const year = dateFrom.slice(4);
     const day = dateFrom[0] + dateFrom[1];
     const month = dateFrom[2] + dateFrom[3];
-    dateFrom = `${day}/${month}/${year}`;
+    dateFrom = new Date(year, month, day);
   }
   if (dateTo) {
     const year = dateTo.slice(4);
     const day = dateTo[0] + dateTo[1];
     const month = dateTo[2] + dateTo[3];
-    dateTo = `${day}/${month}/${year}`;
+    dateTo = new Date(year, month, day);
   }
   const runs = await connection
     .select('*')
@@ -48,8 +48,8 @@ exports.fetchRuns = async (kennel_id, { dateFrom, dateTo }) => {
     .modify((queryBuilder) => {
       if (dateFrom || dateTo) {
         queryBuilder.whereBetween('date', [
-          dateTo || '01/01/2000',
-          dateFrom || new Date(),
+          dateFrom || '01/01/2000',
+          dateTo || new Date(),
         ]);
       }
     });
@@ -60,8 +60,8 @@ exports.fetchRuns = async (kennel_id, { dateFrom, dateTo }) => {
     .modify((queryBuilder) => {
       if (dateFrom || dateTo) {
         queryBuilder.whereBetween('date', [
-          dateTo || '01/01/2000',
-          dateFrom || new Date(),
+          dateFrom || '01/01/2000',
+          dateTo || new Date(),
         ]);
       }
     });
@@ -77,13 +77,13 @@ exports.fetchRunsByDog = async (dog_id, { dateTo, dateFrom }) => {
     const year = dateFrom.slice(4);
     const day = dateFrom[0] + dateFrom[1];
     const month = dateFrom[2] + dateFrom[3];
-    dateFrom = `${day}/${month}/${year}`;
+    dateFrom = new Date(year, month, day);
   }
   if (dateTo) {
     const year = dateTo.slice(4);
     const day = dateTo[0] + dateTo[1];
     const month = dateTo[2] + dateTo[3];
-    dateTo = `${day}/${month}/${year}`;
+    dateTo = new Date(year, month, day);
   }
   const runs = await connection
     .select('*')
@@ -92,8 +92,8 @@ exports.fetchRunsByDog = async (dog_id, { dateTo, dateFrom }) => {
     .modify((queryBuilder) => {
       if (dateFrom || dateTo) {
         queryBuilder.whereBetween('date', [
-          dateTo || '01/01/2000',
-          dateFrom || new Date(),
+          dateFrom || '01/01/2000',
+          dateTo || new Date(),
         ]);
       }
     });
@@ -103,8 +103,8 @@ exports.fetchRunsByDog = async (dog_id, { dateTo, dateFrom }) => {
     .modify((queryBuilder) => {
       if (dateFrom || dateTo) {
         queryBuilder.whereBetween('date', [
-          dateTo || '01/01/2000',
-          dateFrom || new Date(),
+          dateFrom || '01/01/2000',
+          dateTo || new Date(),
         ]);
       }
     });
