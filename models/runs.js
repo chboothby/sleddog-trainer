@@ -33,13 +33,13 @@ exports.fetchRuns = async (kennel_id, { dateFrom, dateTo }) => {
     const year = dateFrom.slice(4);
     const day = dateFrom[0] + dateFrom[1];
     const month = dateFrom[2] + dateFrom[3];
-    dateFrom = new Date(year, parseInt(month) + 1, day);
+    dateFrom = new Date(year, parseInt(month) - 1, day);
   }
   if (dateTo) {
     const year = dateTo.slice(4);
     const day = dateTo[0] + dateTo[1];
     const month = dateTo[2] + dateTo[3];
-    dateTo = new Date(year, parseInt(month) + 1, day);
+    dateTo = new Date(year, parseInt(month) - 1, day);
   }
   const runs = await connection
     .select('*')
@@ -77,13 +77,13 @@ exports.fetchRunsByDog = async (dog_id, { dateTo, dateFrom }) => {
     const year = dateFrom.slice(4);
     const day = dateFrom[0] + dateFrom[1];
     const month = dateFrom[2] + dateFrom[3];
-    dateFrom = new Date(year, parseInt(month) + 1, day);
+    dateFrom = new Date(year, parseInt(month) - 1, day);
   }
   if (dateTo) {
     const year = dateTo.slice(4);
     const day = dateTo[0] + dateTo[1];
     const month = dateTo[2] + dateTo[3];
-    dateTo = new Date(year, parseInt(month) + 1, day);
+    dateTo = new Date(year, parseInt(month) - 1, day);
   }
   const runs = await connection
     .select('*')
