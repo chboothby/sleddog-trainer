@@ -15,16 +15,22 @@ exports.addKennelId = (data, kennelRef) => {
 exports.formatDate = (data) => {
   return data[0].birth_date
     ? data.map(({ birth_date, ...rest }) => {
-        const date = birth_date.split("/");
+        const date = birth_date.split('/');
+        console.log(date);
         const newDate = new Date(date[2], date[1], date[0]);
+        console.log(newDate);
         return {
           ...rest,
           birth_date: newDate,
         };
       })
     : data.map(({ date, ...rest }) => {
-        const d = date.split("/");
+        const d = date.split('/');
+        if (d[2].length === 2) {
+          d[2] = '20' + d[2];
+        }
         const newDate = new Date(d[2], d[1], d[0]);
+        console.log(newDate);
         return {
           ...rest,
           date: newDate,
