@@ -17,7 +17,6 @@ exports.formatDate = (data) => {
     ? data.map(({ birth_date, ...rest }) => {
         const date = birth_date.split('/');
         const newDate = new Date(date[2], parseInt(date[1]) - 1, date[0]);
-        console.log(newDate);
         return {
           ...rest,
           birth_date: newDate,

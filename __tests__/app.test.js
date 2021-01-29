@@ -487,7 +487,7 @@ describe('/api', async function () {
         expect(runs.runs.length).to.eql(1);
       });
     });
-    describe('GET dogs runs', () => {
+    describe.only('GET dogs runs', () => {
       it('returns 200 and array of runs', async () => {
         const {
           status,
@@ -495,7 +495,7 @@ describe('/api', async function () {
         } = await request(app).get('/api/dogs/1/runs');
 
         expect(status).to.equal(200);
-        expect(runs.runs.length).to.equal(1);
+        expect(runs.runs.length).to.equal(8);
       });
       it('should return all runs with total dog distance key', async () => {
         const {
